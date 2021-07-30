@@ -179,7 +179,7 @@ def build(args):
     ]
     run_params = dict(zip(params_def, run_params))
 
-    return pd.DataFrame.from_dict(run_params)
+    return run_params
 
 
 def cache(args):
@@ -187,8 +187,8 @@ def cache(args):
     params = {
         "bogota": {
             "layer": ["schools", "adults", "elders"],
-            "RecPeriod": [3.447429, 3.199665, 3.587770],
-            "R0": [2.341840, 2.409857, 2.404539],
+            "RecPeriod": [3.4474289566430567, 3.199665313607661, 3.5877699639670877],
+            "R0": [2.341839924665767, 2.4098569613929888, 2.404539370553576],
         }
     }
 

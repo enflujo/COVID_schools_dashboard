@@ -1,5 +1,5 @@
 import pandas as pd
-import os
+import os, json
 
 
 def save(args, tvec, soln, soln_cum, history, cumulative_history, number_nodes):
@@ -125,3 +125,18 @@ def save(args, tvec, soln, soln_cum, history, cumulative_history, number_nodes):
         ),
         index=False,
     )
+
+    with open(
+        "{}/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_com_history.json".format(
+            path_save,
+            str(number_nodes),
+            str(args.intervention),
+            str(args.school_occupation),
+            args.masks_type,
+            str(args.fraction_people_masks),
+            str(args.ventilation_out),
+            args.res_id,
+        ),
+        "w",
+    ) as outfile:
+        json.dump(df_results_com_history.to_dict(), outfile, indent=2)
