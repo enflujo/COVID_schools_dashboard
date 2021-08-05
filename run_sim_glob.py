@@ -459,6 +459,10 @@ dist_of_pop[-1] += 1-sum(dist_of_pop)
 
 # Classifying each person
 classify_pop = np2.random.choice(['preschool','primary','highschool','work','other'], size=pop, p=dist_of_pop)
+# Save as df
+classify_pop_df = pd.DataFrame()
+classify_pop_df['indx'] = list(np.arange(0,pop,1))
+classify_pop_df['type'] = list(classify_pop)
 
 # Number of individuals in each group
 state, counts = np2.unique(classify_pop, return_counts=True)
@@ -841,6 +845,7 @@ path_save = os.path.join(results_path, intervention_save, str(number_nodes))
 df_results_soln.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_soln.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
 df_results_soln_cum.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_soln_cum.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
 df_results_soln_ind.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_soln_ind.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
+classify_pop_df.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_indIDS.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
 # df_results_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
 # df_results_com_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_com_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
 
