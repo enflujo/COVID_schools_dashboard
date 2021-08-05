@@ -699,6 +699,7 @@ BOG_D  = int( pop * deaths/total_pop_BOG )
 print('Simulating...')
 soln=np.zeros((args.number_trials,total_steps,7))
 soln_cum=np.zeros((args.number_trials,total_steps,7))
+soln_ind=np.zeros((args.number_trials,len(time_intervals),pop), dtype=np.int8)
 
 for key in tqdm(range(args.number_trials), total=args.number_trials):
 
@@ -721,15 +722,17 @@ for key in tqdm(range(args.number_trials), total=args.number_trials):
   _, init_state_timer = state_length_sampler(random.PRNGKey(key), init_state)
 
   #Run simulation
-  _, state, _, _, total_history = model.simulate_intervals(
+  _, state, _, states_evolution, total_history = model.simulate_intervals(
     ws, time_intervals, state_length_sampler, infection_probabilities, 
     recovery_probabilities, init_state, init_state_timer, key = random.PRNGKey(key), epoch_len=1)
   
   history = np.array(total_history)[:, 0, :]  # This unpacks current state counts
   soln=index_add(soln,index[key,:, :],history)
 
-  cumulative_history = np.array(total_history)[:, 1, :] 
-  soln_cum=index_add(soln_cum,index[key,:, :],cumulative_history)
+  soln_ind=index_add(soln_ind,index[key,:, :],states_evolution)
+
+#   cumulative_history = np.array(total_history)[:, 1, :] 
+#   soln_cum=index_add(soln_cum,index[key,:, :],cumulative_history)
 
 
 #------------------------------------------------------------------------------------------------------------------------------------------------
@@ -749,6 +752,7 @@ print('Saving results...')
 
 # Save results
 tvec = np.linspace(0,Tmax,total_steps)
+hvec = np.arange(4,sum(time_intervals)+4,4)
 
 df_soln_list = []
 for i in range(args.number_trials):
@@ -780,26 +784,38 @@ for i in range(args.number_trials):
   df_soln_cum_list.append(df_results_soln_cum_i)
 df_results_soln_cum = pd.concat(df_soln_cum_list)
 
+df_soln_ind_list = []
+for i in range(args.number_trials):
+  inds_indx = [str(n) for n in range(0,pop)]
+  cols = ['iter','tvec']
+  cols.extend(inds_indx)
+  df_results_soln_ind_i = pd.DataFrame(columns=cols)
+  df_results_soln_ind_i['iter']  = [i] * len(hvec)
+  df_results_soln_ind_i['tvec']  = list(hvec)
+  for ind in inds_indx:
+      df_results_soln_ind_i[ind] = list(soln_ind[i,:,int(ind)])
+  df_soln_ind_list.append(df_results_soln_ind_i)
+df_results_soln_ind = pd.concat(df_soln_ind_list)
 
-df_results_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-df_results_history['tvec']  = list(tvec)
-df_results_history['S']     = list(history[:,0])
-df_results_history['E']     = list(history[:,1])
-df_results_history['I1']    = list(history[:,2])
-df_results_history['I2']    = list(history[:,3])
-df_results_history['I3']    = list(history[:,4])
-df_results_history['D']     = list(history[:,5])
-df_results_history['R']     = list(history[:,6])
+# df_results_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
+# df_results_history['tvec']  = list(tvec)
+# df_results_history['S']     = list(history[:,0])
+# df_results_history['E']     = list(history[:,1])
+# df_results_history['I1']    = list(history[:,2])
+# df_results_history['I2']    = list(history[:,3])
+# df_results_history['I3']    = list(history[:,4])
+# df_results_history['D']     = list(history[:,5])
+# df_results_history['R']     = list(history[:,6])
 
-df_results_com_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-df_results_com_history['tvec']  = list(tvec)
-df_results_com_history['S']     = list(cumulative_history[:,0])
-df_results_com_history['E']     = list(cumulative_history[:,1])
-df_results_com_history['I1']    = list(cumulative_history[:,2])
-df_results_com_history['I2']    = list(cumulative_history[:,3])
-df_results_com_history['I3']    = list(cumulative_history[:,4])
-df_results_com_history['D']     = list(cumulative_history[:,5])
-df_results_com_history['R']     = list(cumulative_history[:,6])
+# df_results_com_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
+# df_results_com_history['tvec']  = list(tvec)
+# df_results_com_history['S']     = list(cumulative_history[:,0])
+# df_results_com_history['E']     = list(cumulative_history[:,1])
+# df_results_com_history['I1']    = list(cumulative_history[:,2])
+# df_results_com_history['I2']    = list(cumulative_history[:,3])
+# df_results_com_history['I3']    = list(cumulative_history[:,4])
+# df_results_com_history['D']     = list(cumulative_history[:,5])
+# df_results_com_history['R']     = list(cumulative_history[:,6])
 
 
 intervention_save = None
@@ -824,7 +840,8 @@ path_save = os.path.join(results_path, intervention_save, str(number_nodes))
 
 df_results_soln.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_soln.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
 df_results_soln_cum.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_soln_cum.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
-df_results_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
-df_results_com_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_com_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
+df_results_soln_ind.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_soln_ind.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
+# df_results_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
+# df_results_com_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_com_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
 
 print('Done! \n')

@@ -247,6 +247,7 @@ def simulate_intervals(
     history is the number of each type over the course of the simulation.
   """
   history = []
+  states_evolution = np.zeros((len(step_intervals), init_state.shape[0]), dtype=np.int8)
   state, state_timer = init_state, init_state_timer
   states_cumulative = np.logical_or(
       to_one_hot(state), np.zeros_like(to_one_hot(state), dtype=np.bool_))
@@ -256,9 +257,10 @@ def simulate_intervals(
         recovery_probabilities, state, state_timer, key, epoch_len,
         states_cumulative)
     history.extend(history_)
+    states_evolution = index_add(states_evolution, index[t,:], np.array(state))
     #print('Completed interval {} of {}'.format(t+1, len(ws)))
 
-  return key, state, state_timer, states_cumulative, history
+  return key, state, state_timer, states_evolution, history
 
 
 def plot_single_cumulative(cumulative_history,tvec,n,ymax=1,scale=1,int=0,Tint=0,plotThis=False,plotName="test"):
