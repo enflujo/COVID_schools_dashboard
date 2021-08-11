@@ -52,6 +52,9 @@ def save(args, tvec, hvec, soln, soln_cum, history, soln_ind, number_nodes, node
     work_nodes = nodes['work']
     other_nodes = nodes['other']
 
+    df_soln_ind = df_results_soln_ind.copy()
+    df_soln_ind_mode = df_soln_ind.groupby(by='iter', axis=0).agg(lambda x:x.value_counts().index[0])
+    
     
 
     # df_results_history = pd.DataFrame(columns=["tvec", "S", "E", "I1", "I2", "I3", "D", "R"])
