@@ -17,7 +17,7 @@ class Args:
 
         # Nodes
         self.population = 100  # Speficy the number of individials
-        self.number_trials = 2  # Number of iterations per step
+        self.number_trials = 10  # Number of iterations per step
 
         ############ Defaults ############
         self.res_id = "ND"  # Result ID for simulation save

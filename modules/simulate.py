@@ -93,6 +93,7 @@ def simulate(args, total_steps, pop, total_pop_BOG, ws, time_intervals):
 
     soln = np.zeros((args.number_trials, total_steps, 7))
     soln_cum = np.zeros((args.number_trials, total_steps, 7))
+    soln_ind=np.zeros((args.number_trials,len(time_intervals),pop), dtype=np.int8)
 
     for key in tqdm(range(args.number_trials), total=args.number_trials):
 
@@ -114,7 +115,7 @@ def simulate(args, total_steps, pop, total_pop_BOG, ws, time_intervals):
         _, init_state_timer = state_length_sampler(random.PRNGKey(key), init_state)
 
         # Run simulation
-        _, state, _, _, total_history = model.simulate_intervals(
+        _, state, _, states_evolution, total_history = model.simulate_intervals(
             ws,
             time_intervals,
             state_length_sampler,
@@ -129,8 +130,9 @@ def simulate(args, total_steps, pop, total_pop_BOG, ws, time_intervals):
         # This unpacks current state counts
         history = np.array(total_history)[:, 0, :]
         soln = index_add(soln, index[key, :, :], history)
+        soln_ind=index_add(soln_ind,index[key,:, :],states_evolution)
 
-        cumulative_history = np.array(total_history)[:, 1, :]
-        soln_cum = index_add(soln_cum, index[key, :, :], cumulative_history)
+        # cumulative_history = np.array(total_history)[:, 1, :]
+        # soln_cum = index_add(soln_cum, index[key, :, :], cumulative_history)
 
-    return history, soln, cumulative_history, soln_cum
+    return history, soln, soln_ind, soln_cum

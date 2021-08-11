@@ -141,7 +141,7 @@ def create_graph_matrix(args):
     )
 
     # Saves graphs
-    return ages["total_pop"], [
+    return nodes, ages["total_pop"], [
         matrix_household,
         matrix_preschool,
         matrix_primary,
