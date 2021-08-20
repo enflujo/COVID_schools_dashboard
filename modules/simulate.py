@@ -83,13 +83,21 @@ def simulate(args, total_steps, pop, total_pop_BOG, ws, time_intervals):
         # Makes sure non-transitional states are returning 0.
         return key, lengths * model.is_transitional(new_state)
 
-    BOG_E = int(pop * (cum_cases - cum_rec - mild_house - deaths) / total_pop_BOG)
-    # Assuming that 30% of population is already recovered
+    # BOG_E = int(pop * (cum_cases - cum_rec - mild_house - deaths) / total_pop_BOG)
+    # # Assuming that 30% of population is already recovered
+    # BOG_R = int(pop * 0.3)
+    # BOG_I1 = int(pop * mild_house / total_pop_BOG)
+    # BOG_I2 = int(pop * hosp_beds / total_pop_BOG)
+    # BOG_I3 = int(pop * ICU_beds / total_pop_BOG)
+    # BOG_D = int(pop * deaths / total_pop_BOG)
+
+    BOG_E = 0
+    # Assuming that 30% of population is already recovered/inmune
     BOG_R = int(pop * 0.3)
-    BOG_I1 = int(pop * mild_house / total_pop_BOG)
-    BOG_I2 = int(pop * hosp_beds / total_pop_BOG)
-    BOG_I3 = int(pop * ICU_beds / total_pop_BOG)
-    BOG_D = int(pop * deaths / total_pop_BOG)
+    BOG_I1 = int(pop * 0.01)
+    BOG_I2 = 0
+    BOG_I3 = 0
+    BOG_D = 0
 
     soln = np.zeros((args.number_trials, total_steps, 7))
     soln_cum = np.zeros((args.number_trials, total_steps, 7))
