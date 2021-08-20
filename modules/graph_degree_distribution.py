@@ -3,7 +3,7 @@ import numpy as np2
 
 
 def build(args, ages, teachers, nodes):
-    age_tracker = np2.zeros(args.population)
+    age_tracker = np2.zeros(int(args.population*2))
     # Preschool -------------------------------------------------------
     mean, std = args.preschool_mean, args.preschool_std
     p = 1 - (std ** 2 / mean)
@@ -17,7 +17,7 @@ def build(args, ages, teachers, nodes):
 
     # Assign ages to the preschool going population acc. to their proportion from the census data
     prob = []
-    preschool_pop_ = ages["preschool"][0] + teachers["preschool"][0]
+    preschool_pop_ = [args.n_school_going_preschool] + teachers["preschool"][0]
     preschool_pop = sum(preschool_pop_)
 
     for i in range(0, len(preschool_pop_)):
@@ -40,7 +40,7 @@ def build(args, ages, teachers, nodes):
 
     # Assign ages to the primary going population acc. to their proportion from the census data
     prob = []
-    primary_pop_ = ages["primary"][0] + teachers["primary"][0]
+    primary_pop_ = [args.n_school_going_primary] + teachers["primary"][0]
     primary_pop = sum(primary_pop_)
 
     for i in range(0, len(primary_pop_)):
@@ -63,7 +63,7 @@ def build(args, ages, teachers, nodes):
 
     # Assign ages to the highschool going population acc. to their proportion from the census data
     prob = []
-    highschool_pop_ = ages["highschool"][0] + teachers["highschool"][0]
+    highschool_pop_ = [args.n_school_going_highschool] + teachers["highschool"][0]
     highschool_pop = sum(highschool_pop_)
 
     for i in range(0, len(highschool_pop_)):
