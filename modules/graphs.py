@@ -1,10 +1,12 @@
 import jax.numpy as np
 import numpy as np2
+from numpy.lib.function_base import interp
 
 from networks import create_networks
-from modules.graph_age_distribution import cache as get_age_distribution
+from modules.graph_age_distribution import build as get_age_distribution
 from modules.graph_age_params import cache as get_age_params
-from modules.graph_teachers_distribution import cache as get_teachers_distribution
+# from modules.graph_teachers_distribution import cache as get_teachers_distribution
+from modules.graph_teachers_distribution import build as get_teachers_distribution
 from modules.graph_household_sizes import cache as get_household_sizes
 from modules.graph_classify_nodes import build as classify_nodes
 from modules.graph_degree_distribution import build as get_degree_distribution
@@ -40,13 +42,13 @@ def create_graph_matrix(args):
 
     age_group_community = np2.random.choice(np2.arange(0, len(ages["community"][0]), 1), size=pop, p=prob, replace=True)
 
-    age_tracker_all = np2.zeros(pop)
-    community_indx = np2.arange(0, pop, 1)
-    for i in range(pop):
+    age_tracker_all = np2.zeros(int(pop*2))
+    community_indx = np2.arange(0, int(pop), 1)
+    for i in range((pop)):
         age_tracker_all[community_indx[i]] = age_group_community[i]
 
     matrix_household = create_networks.create_fully_connected(
-        household_sizes, age_tracker_all, np2.arange(0, pop, 1), df_run_params, args.delta_t
+        household_sizes, age_tracker_all, np2.arange(0, int(pop), 1), df_run_params, args.delta_t
     )
 
     age_tracker = degrees["age_tracker"]
@@ -62,9 +64,9 @@ def create_graph_matrix(args):
         age_tracker,
         df_run_params,
         args.delta_t,
-        args.preschool_length_room,
-        args.preschool_width_room,
-        args.height_room,
+        args.length_room_preschool,
+        args.width_room_preschool,
+        args.height_room_preschool,
         args.ventilation_out,
         inhalation_mask,
         exhalation_mask,
@@ -83,9 +85,9 @@ def create_graph_matrix(args):
         age_tracker,
         df_run_params,
         args.delta_t,
-        args.primary_length_room,
-        args.primary_width_room,
-        args.height_room,
+        args.length_room_primary,
+        args.width_room_primary,
+        args.height_room_primary,
         args.ventilation_out,
         inhalation_mask,
         exhalation_mask,
@@ -104,9 +106,9 @@ def create_graph_matrix(args):
         age_tracker,
         df_run_params,
         args.delta_t,
-        args.highschool_length_room,
-        args.highschool_width_room,
-        args.height_room,
+        args.length_room_highschool,
+        args.width_room_highschool,
+        args.height_room_highschool,
         args.ventilation_out,
         inhalation_mask,
         exhalation_mask,
