@@ -3,21 +3,25 @@ import pandas as pd
 
 
 def build(args):
+    '''
+    Get age distribution only for layers not involved in school
+    '''
+
     # Get age distribution
     ages_data_BOG = pd.read_csv(args.ages_data_path, encoding="unicode_escape", delimiter=";")
-    total_pop_BOG = int(ages_data_BOG["Total.3"][17].replace(".", ""))
+    # total_pop_BOG = int(ages_data_BOG["Total.3"][17].replace(".", ""))
 
     # Ages 0-4 (0)
     very_young_ = [int(ages_data_BOG["Total.3"][0].replace(".", ""))]
 
     # Ages 5-9 (1)
-    preschool_ = [int(ages_data_BOG["Total.3"][1].replace(".", ""))]
+    # preschool_ = [args.n_school_going_preschool]
 
     # Ages 10-14 (2)
-    primary_ = [int(ages_data_BOG["Total.3"][2].replace(".", ""))]
+    # primary_ = [args.n_school_going_primary]
 
     # Ages 15-19 (3)
-    highschool_ = [int(ages_data_BOG["Total.3"][3].replace(".", ""))]
+    # highschool_ = [args.n_school_going_highschool]
 
     # Ages 20-24 (4)
     university_ = [int(ages_data_BOG["Total.3"][4].replace(".", ""))]
@@ -29,20 +33,60 @@ def build(args):
     elderly_ = [int(ages_data_BOG["Total.3"][i].replace(".", "")) for i in range(13, 16 + 1)]
 
     # Community ages
-    community_ = very_young_ + preschool_ + primary_ + highschool_ + university_ + work_ + elderly_
+    community_ = very_young_ + university_ + work_ + elderly_
 
     return {
-        "very_young": [very_young_, sum(very_young_) / total_pop_BOG],
-        "preschool": [preschool_, sum(preschool_) / total_pop_BOG],
-        "primary": [primary_, sum(primary_) / total_pop_BOG],
-        "highschool": [highschool_, sum(highschool_) / total_pop_BOG],
-        "university": [university_, sum(university_) / total_pop_BOG],
-        "work": [work_, sum(work_) / total_pop_BOG],
-        "elderly": [elderly_, sum(elderly_) / total_pop_BOG],
+        "very_young": [very_young_, sum(very_young_) / sum(community_)],
+        "university": [university_, sum(university_) / sum(community_)],
+        "work": [work_, sum(work_) / sum(community_)],
+        "elderly": [elderly_, sum(elderly_) / sum(community_)],
         "adults": np.arange(4, 16 + 1, 1),
-        "community": [community_, sum(community_) / total_pop_BOG],
-        "total_pop": total_pop_BOG,
+        "community": [community_, sum(community_) / sum(community_)],
+        "total_pop": sum(community_),
     }
+
+
+# def build(args):
+#     # Get age distribution
+#     ages_data_BOG = pd.read_csv(args.ages_data_path, encoding="unicode_escape", delimiter=";")
+#     total_pop_BOG = int(ages_data_BOG["Total.3"][17].replace(".", ""))
+
+#     # Ages 0-4 (0)
+#     very_young_ = [int(ages_data_BOG["Total.3"][0].replace(".", ""))]
+
+#     # Ages 5-9 (1)
+#     preschool_ = [int(ages_data_BOG["Total.3"][1].replace(".", ""))]
+
+#     # Ages 10-14 (2)
+#     primary_ = [int(ages_data_BOG["Total.3"][2].replace(".", ""))]
+
+#     # Ages 15-19 (3)
+#     highschool_ = [int(ages_data_BOG["Total.3"][3].replace(".", ""))]
+
+#     # Ages 20-24 (4)
+#     university_ = [int(ages_data_BOG["Total.3"][4].replace(".", ""))]
+
+#     # Ages 25-64 (5,6,7,8,9,10,11,12)
+#     work_ = [int(ages_data_BOG["Total.3"][i].replace(".", "")) for i in range(5, 12 + 1)]
+
+#     # Ages 65+ (13,14,15,16)
+#     elderly_ = [int(ages_data_BOG["Total.3"][i].replace(".", "")) for i in range(13, 16 + 1)]
+
+#     # Community ages
+#     community_ = very_young_ + preschool_ + primary_ + highschool_ + university_ + work_ + elderly_
+
+#     return {
+#         "very_young": [very_young_, sum(very_young_) / total_pop_BOG],
+#         "preschool": [preschool_, sum(preschool_) / total_pop_BOG],
+#         "primary": [primary_, sum(primary_) / total_pop_BOG],
+#         "highschool": [highschool_, sum(highschool_) / total_pop_BOG],
+#         "university": [university_, sum(university_) / total_pop_BOG],
+#         "work": [work_, sum(work_) / total_pop_BOG],
+#         "elderly": [elderly_, sum(elderly_) / total_pop_BOG],
+#         "adults": np.arange(4, 16 + 1, 1),
+#         "community": [community_, sum(community_) / total_pop_BOG],
+#         "total_pop": total_pop_BOG,
+#     }
 
 
 def cache(args):
