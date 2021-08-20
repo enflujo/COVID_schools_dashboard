@@ -9,15 +9,14 @@ from datetime import timedelta
 
 
 async def process(args):
-    pop = args.population
+    pop = args.population*2
     Tmax = args.Tmax
     days_intervals = [1] * Tmax
     delta_t = args.delta_t
     step_intervals = [int(x / delta_t) for x in days_intervals]
     total_steps = sum(step_intervals)
     tvec = np.linspace(0, Tmax, total_steps)
-    time_intervals = 2400
-    hvec = np.arange(4,sum(time_intervals)+4,4)
+
 
     total_start = timer()
     print("Creating graphs...")
@@ -34,13 +33,15 @@ async def process(args):
 
     print("Simulating...")
     start = timer()
-    history, soln, soln_ind, soln_cum = sim.simulate(args, total_steps, pop, total_pop, ws, time_intervals)
+    _, _, soln_ind, _ = sim.simulate(args, total_steps, pop, total_pop, ws, time_intervals)
     end = timer()
     print("Simulation created in: {0}".format(str(timedelta(seconds=(end - start)))))
 
     print("Saving results...")
     start = timer()
-    save(args, tvec, hvec, soln, soln_cum, history, soln_ind, pop, nodes)
+    hvec = np.arange(4,sum(time_intervals)+4,4)
+    save(args, hvec, soln_ind, pop, nodes)
+    # save(args, tvec, hvec, soln, soln_cum, history, soln_ind, pop, nodes)
     end = timer()
     print("Saved results in: {0}".format(str(timedelta(seconds=(end - start)))))
 
