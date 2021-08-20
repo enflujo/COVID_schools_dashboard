@@ -13,7 +13,7 @@ from jax import random
 from jax.nn import relu
 import jax.numpy as np
 import pandas as pd
-from jax.ops import index_add
+from jax.ops import index_add, index
 import matplotlib.pyplot as plt
 
 SUSCEPTIBLE = 0
