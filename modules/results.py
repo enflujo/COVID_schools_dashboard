@@ -37,27 +37,27 @@ def save(args, hvec, soln_ind, number_nodes, nodes):
         pre_inf = df_soln_ind_i[preschool_nodes] == 2
         pre_inf = pre_inf.any()
         pre_inf = pre_inf[pre_inf == True].shape[0] # n infected in sim
-        pre_inf_list.append(pre_inf)
+        pre_inf_list.append(pre_inf/nodes['preschool'][1])
 
         pri_inf = df_soln_ind_i[primary_nodes] == 2
         pri_inf = pri_inf.any()
         pri_inf = pri_inf[pri_inf == True].shape[0] # n infected in sim
-        pri_inf_list.append(pri_inf)
+        pri_inf_list.append(pri_inf/nodes['primary'][1])
 
         high_inf = df_soln_ind_i[highschool_nodes] == 2
         high_inf = high_inf.any()
         high_inf = high_inf[high_inf == True].shape[0] # n infected in sim
-        high_inf_list.append(high_inf)
+        high_inf_list.append(high_inf/nodes['highschool'][1])
 
         work_inf = df_soln_ind_i[work_nodes] == 2
         work_inf = work_inf.any()
         work_inf = work_inf[work_inf == True].shape[0] # n infected in sim
-        work_inf_list.append(work_inf)
+        work_inf_list.append(work_inf/nodes['work'][1])
 
         comm_inf = df_soln_ind_i[other_nodes] == 2
         comm_inf = comm_inf.any()
         comm_inf = comm_inf[comm_inf == True].shape[0] # n infected in sim
-        comm_inf_list.append(comm_inf)
+        comm_inf_list.append(comm_inf/nodes['other'][1])
 
     out = {'preschool': sum(pre_inf_list)/len(pre_inf_list),
            'primary': sum(pri_inf_list)/len(pri_inf_list),
