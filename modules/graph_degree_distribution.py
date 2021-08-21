@@ -3,7 +3,7 @@ import numpy as np2
 
 
 def build(args, ages, teachers, nodes):
-    age_tracker = np2.zeros(int(args.population*2))
+    age_tracker = np2.zeros(int(args.population * 2))
     # Preschool -------------------------------------------------------
     mean, std = args.preschool_mean, args.preschool_std
     p = 1 - (std ** 2 / mean)

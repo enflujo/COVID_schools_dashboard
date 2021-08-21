@@ -1,12 +1,9 @@
-import jax.numpy as np
 import numpy as np2
-from numpy.lib.function_base import interp
 
 from networks import create_networks
-from modules.graph_age_distribution import build as get_age_distribution
+from modules.graph_age_distribution import cache as get_age_distribution
 from modules.graph_age_params import cache as get_age_params
-# from modules.graph_teachers_distribution import cache as get_teachers_distribution
-from modules.graph_teachers_distribution import build as get_teachers_distribution
+from modules.graph_teachers_distribution import cache as get_teachers_distribution
 from modules.graph_household_sizes import cache as get_household_sizes
 from modules.graph_classify_nodes import build as classify_nodes
 from modules.graph_degree_distribution import build as get_degree_distribution
@@ -17,7 +14,7 @@ def create_graph_matrix(args):
     household_sizes = get_household_sizes(args)
     ages = get_age_distribution(args)
     teachers = get_teachers_distribution(args)
-    nodes = classify_nodes(args, ages, teachers)
+    nodes = classify_nodes(args, ages)
     degrees = get_degree_distribution(args, ages, teachers, nodes)
 
     df_run_params = get_age_params(args)
@@ -42,8 +39,9 @@ def create_graph_matrix(args):
 
     age_group_community = np2.random.choice(np2.arange(0, len(ages["community"][0]), 1), size=pop, p=prob, replace=True)
 
-    age_tracker_all = np2.zeros(int(pop*2))
+    age_tracker_all = np2.zeros(int(pop * 2))
     community_indx = np2.arange(0, int(pop), 1)
+
     for i in range((pop)):
         age_tracker_all[community_indx[i]] = age_group_community[i]
 
@@ -143,11 +141,14 @@ def create_graph_matrix(args):
     )
 
     # Saves graphs
-    return nodes, ages["total_pop"], [
-        matrix_household,
-        matrix_preschool,
-        matrix_primary,
-        matrix_highschool,
-        matrix_work,
-        matrix_community,
-    ]
+    return (
+        nodes,
+        [
+            matrix_household,
+            matrix_preschool,
+            matrix_primary,
+            matrix_highschool,
+            matrix_work,
+            matrix_community,
+        ],
+    )

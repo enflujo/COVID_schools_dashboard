@@ -51,13 +51,4 @@ def cache(args):
 
     household_sizes[-1] -= pop_house - pop
 
-    # # Mean of household degree dist
-    # mean_household = sum((np2.asarray(household_sizes)-1)*np2.asarray(household_sizes))/pop
-
-    # # Keeping track of the household indx for each individual
-    # house_indices = np2.repeat(np2.arange(0,len(household_sizes),1), household_sizes)
-
-    # # Keeping track of the household size for each individual
-    # track_house_size = np2.repeat(household_sizes, household_sizes)
-
     return household_sizes
