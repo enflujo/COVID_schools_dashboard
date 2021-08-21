@@ -3,8 +3,7 @@ from jax import random
 from jax.ops import index_add, index_update, index
 from jax import jit, random
 import functools
-from tqdm import tqdm
-from models import model
+from models.model import is_transitional, simulate_intervals
 
 # Bogota data
 
@@ -14,11 +13,11 @@ mild_house = 17595
 hosp_beds = 5369
 ICU_beds = 1351
 deaths = 13125
+
 # Model parameter values
-
-
 DurMildInf = 6  # Duration of mild infections, days
 DurSevereInf = 6  # Duration of hospitalization (severe infection), days
+
 # Time from ICU admission to death/recovery (critical infection), days
 DurCritInf = 8
 
@@ -71,7 +70,7 @@ def discrete_gamma(key, alpha, beta, shape=()):
     return _discrete_gamma(key, alpha, beta, shape_)
 
 
-def simulate(args, total_steps, pop, total_pop_BOG, ws, time_intervals):
+def simulate(args, total_steps, pop, ws, time_intervals):
     @jit
     def state_length_sampler(key, new_state):
         """Duration in transitional state. Must be at least 1 time unit."""
@@ -81,15 +80,7 @@ def simulate(args, total_steps, pop, total_pop_BOG, ws, time_intervals):
         # Time must be at least 1.
         lengths = 1 + discrete_gamma(subkey, alphas, betas)
         # Makes sure non-transitional states are returning 0.
-        return key, lengths * model.is_transitional(new_state)
-
-    # BOG_E = int(pop * (cum_cases - cum_rec - mild_house - deaths) / total_pop_BOG)
-    # # Assuming that 30% of population is already recovered
-    # BOG_R = int(pop * 0.3)
-    # BOG_I1 = int(pop * mild_house / total_pop_BOG)
-    # BOG_I2 = int(pop * hosp_beds / total_pop_BOG)
-    # BOG_I3 = int(pop * ICU_beds / total_pop_BOG)
-    # BOG_D = int(pop * deaths / total_pop_BOG)
+        return key, lengths * is_transitional(new_state)
 
     BOG_E = 0
     # Assuming that 30% of population is already recovered/inmune
@@ -100,10 +91,9 @@ def simulate(args, total_steps, pop, total_pop_BOG, ws, time_intervals):
     BOG_D = 0
 
     soln = np.zeros((args.number_trials, total_steps, 7))
-    soln_cum = np.zeros((args.number_trials, total_steps, 7))
-    soln_ind=np.zeros((args.number_trials,len(time_intervals),pop), dtype=np.int8)
+    soln_ind = np.zeros((args.number_trials, len(time_intervals), pop), dtype=np.int8)
 
-    for key in tqdm(range(args.number_trials), total=args.number_trials):
+    for key in range(args.number_trials):
 
         # Initial condition
         init_ind_E = random.uniform(random.PRNGKey(key), shape=(BOG_E,), maxval=pop).astype(np.int32)
@@ -123,7 +113,7 @@ def simulate(args, total_steps, pop, total_pop_BOG, ws, time_intervals):
         _, init_state_timer = state_length_sampler(random.PRNGKey(key), init_state)
 
         # Run simulation
-        _, state, _, states_evolution, total_history = model.simulate_intervals(
+        states_evolution, total_history = simulate_intervals(
             ws,
             time_intervals,
             state_length_sampler,
@@ -138,9 +128,6 @@ def simulate(args, total_steps, pop, total_pop_BOG, ws, time_intervals):
         # This unpacks current state counts
         history = np.array(total_history)[:, 0, :]
         soln = index_add(soln, index[key, :, :], history)
-        soln_ind=index_add(soln_ind,index[key,:, :],states_evolution)
+        soln_ind = index_add(soln_ind, index[key, :, :], states_evolution)
 
-        # cumulative_history = np.array(total_history)[:, 1, :]
-        # soln_cum = index_add(soln_cum, index[key, :, :], cumulative_history)
-
-    return history, soln, soln_ind, soln_cum
+    return soln_ind
