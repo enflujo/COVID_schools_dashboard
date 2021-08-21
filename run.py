@@ -1,6 +1,6 @@
 #!
 import modules.simulate as sim
-from modules.results import save
+from modules.results import run as results
 from modules.graphs import create_graph_matrix
 from modules.dynamics import create_dynamics
 import jax.numpy as np
@@ -9,19 +9,17 @@ from datetime import timedelta
 
 
 async def process(args):
-    pop = args.population*2
+    pop = args.population * 2
     Tmax = args.Tmax
     days_intervals = [1] * Tmax
     delta_t = args.delta_t
     step_intervals = [int(x / delta_t) for x in days_intervals]
     total_steps = sum(step_intervals)
-    tvec = np.linspace(0, Tmax, total_steps)
-
 
     total_start = timer()
     print("Creating graphs...")
     start = timer()
-    nodes, total_pop, multilayer_matrix = create_graph_matrix(args)
+    nodes, multilayer_matrix = create_graph_matrix(args)
     end = timer()
     print("Graphs created in: {0}".format(str(timedelta(seconds=(end - start)))))
 
@@ -33,17 +31,12 @@ async def process(args):
 
     print("Simulating...")
     start = timer()
-    _, _, soln_ind, _ = sim.simulate(args, total_steps, pop, total_pop, ws, time_intervals)
+    soln_ind = sim.simulate(args, total_steps, pop, ws, time_intervals)
     end = timer()
     print("Simulation created in: {0}".format(str(timedelta(seconds=(end - start)))))
 
-    print("Saving results...")
-    start = timer()
-    hvec = np.arange(4,sum(time_intervals)+4,4)
-    save(args, hvec, soln_ind, pop, nodes)
-    # save(args, tvec, hvec, soln, soln_cum, history, soln_ind, pop, nodes)
-    end = timer()
-    print("Saved results in: {0}".format(str(timedelta(seconds=(end - start)))))
-
+    hvec = np.arange(4, sum(time_intervals) + 4, 4)
     total_end = timer()
     print("Done, total process in: {0}".format(str(timedelta(seconds=(total_end - total_start)))))
+
+    return results(args, hvec, soln_ind, pop, nodes)
