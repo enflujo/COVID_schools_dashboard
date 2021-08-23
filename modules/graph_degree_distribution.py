@@ -4,74 +4,91 @@ import numpy as np2
 
 def build(args, ages, teachers, nodes):
     age_tracker = np2.zeros(int(args.population*2))
+    school_levels = [args.n_school_going_preschool > 0,
+                     args.n_school_going_primary > 0,
+                     args.n_school_going_highschool > 0]
+    out = {} 
+
     # Preschool -------------------------------------------------------
-    mean, std = args.preschool_mean, args.preschool_std
-    p = 1 - (std ** 2 / mean)
-    n_binom = mean / p
+    if school_levels[0] is True:
 
-    preschool_going = nodes["preschool"][1]
-    preschool_degree = np2.random.binomial(n_binom, p, size=preschool_going)
-    n_preschool = preschool_going / args.preschool_size
+        mean, std = args.preschool_mean, args.preschool_std
+        p = 1 - (std ** 2 / mean)
+        n_binom = mean / p
 
-    preschool_clroom = np2.random.choice(np.arange(0, n_preschool + 1, 1), size=preschool_going)
+        preschool_going = nodes["preschool"][1]
+        preschool_degree = np2.random.binomial(n_binom, p, size=preschool_going)
+        n_preschool = preschool_going / args.preschool_size
 
-    # Assign ages to the preschool going population acc. to their proportion from the census data
-    prob = []
-    preschool_pop_ = [args.n_school_going_preschool] + teachers["preschool"][0]
-    preschool_pop = sum(preschool_pop_)
+        preschool_clroom = np2.random.choice(np.arange(0, n_preschool + 1, 1), size=preschool_going)
 
-    for i in range(0, len(preschool_pop_)):
-        prob.append(preschool_pop_[i] / preschool_pop)
-    age_group_preschool = np2.random.choice(np.array([1, 7]), size=preschool_going, p=prob, replace=True)
+        # Assign ages to the preschool going population acc. to their proportion from the census data
+        prob = []
+        preschool_pop_ = [args.n_school_going_preschool] + teachers["preschool"][0]
+        preschool_pop = sum(preschool_pop_)
 
-    for i in range(preschool_going):
-        age_tracker[nodes["preschool"][0][i]] = age_group_preschool[i]
+        for i in range(0, len(preschool_pop_)):
+            prob.append(preschool_pop_[i] / preschool_pop)
+        age_group_preschool = np2.random.choice(np.array([1, 7]), size=preschool_going, p=prob, replace=True)
+
+        for i in range(preschool_going):
+            age_tracker[nodes["preschool"][0][i]] = age_group_preschool[i]
+
+        out["preschool"] = [preschool_degree, preschool_clroom, n_preschool]
 
     # Primary ---------------------------------------------------------
-    mean, std = args.primary_mean, args.primary_std
-    p = 1 - (std ** 2 / mean)
-    n_binom = mean / p
+    if school_levels[1] is True:
 
-    primary_going = nodes["primary"][1]
-    primary_degree = np2.random.binomial(n_binom, p, size=primary_going)
-    n_primary = primary_going / args.primary_size
+        mean, std = args.primary_mean, args.primary_std
+        p = 1 - (std ** 2 / mean)
+        n_binom = mean / p
 
-    primary_clroom = np2.random.choice(np.arange(0, n_primary + 1, 1), size=primary_going)
+        primary_going = nodes["primary"][1]
+        primary_degree = np2.random.binomial(n_binom, p, size=primary_going)
+        n_primary = primary_going / args.primary_size
 
-    # Assign ages to the primary going population acc. to their proportion from the census data
-    prob = []
-    primary_pop_ = [args.n_school_going_primary] + teachers["primary"][0]
-    primary_pop = sum(primary_pop_)
+        primary_clroom = np2.random.choice(np.arange(0, n_primary + 1, 1), size=primary_going)
 
-    for i in range(0, len(primary_pop_)):
-        prob.append(primary_pop_[i] / primary_pop)
-    age_group_primary = np2.random.choice(np.array([2, 7]), size=primary_going, p=prob, replace=True)
+        # Assign ages to the primary going population acc. to their proportion from the census data
+        prob = []
+        primary_pop_ = [args.n_school_going_primary] + teachers["primary"][0]
+        primary_pop = sum(primary_pop_)
 
-    for i in range(primary_going):
-        age_tracker[nodes["primary"][0][i]] = age_group_primary[i]
+        for i in range(0, len(primary_pop_)):
+            prob.append(primary_pop_[i] / primary_pop)
+        age_group_primary = np2.random.choice(np.array([2, 7]), size=primary_going, p=prob, replace=True)
+
+        for i in range(primary_going):
+            age_tracker[nodes["primary"][0][i]] = age_group_primary[i]
+
+        out["primary"] = [primary_degree, primary_clroom, n_primary]
 
     # Highschool -------------------------------------------------------
-    mean, std = args.highschool_mean, args.highschool_std
-    p = 1 - (std ** 2 / mean)
-    n_binom = mean / p
+    if school_levels[2] is True:
 
-    highschool_going = nodes["highschool"][1]
-    highschool_degree = np2.random.binomial(n_binom, p, size=highschool_going)
-    n_highschool = highschool_going / args.highschool_size
+        mean, std = args.highschool_mean, args.highschool_std
+        p = 1 - (std ** 2 / mean)
+        n_binom = mean / p
 
-    highschool_clroom = np2.random.choice(np.arange(0, n_highschool + 1, 1), size=highschool_going)
+        highschool_going = nodes["highschool"][1]
+        highschool_degree = np2.random.binomial(n_binom, p, size=highschool_going)
+        n_highschool = highschool_going / args.highschool_size
 
-    # Assign ages to the highschool going population acc. to their proportion from the census data
-    prob = []
-    highschool_pop_ = [args.n_school_going_highschool] + teachers["highschool"][0]
-    highschool_pop = sum(highschool_pop_)
+        highschool_clroom = np2.random.choice(np.arange(0, n_highschool + 1, 1), size=highschool_going)
 
-    for i in range(0, len(highschool_pop_)):
-        prob.append(highschool_pop_[i] / highschool_pop)
-    age_group_highschool = np2.random.choice(np.array([3, 7]), size=highschool_going, p=prob, replace=True)
+        # Assign ages to the highschool going population acc. to their proportion from the census data
+        prob = []
+        highschool_pop_ = [args.n_school_going_highschool] + teachers["highschool"][0]
+        highschool_pop = sum(highschool_pop_)
 
-    for i in range(highschool_going):
-        age_tracker[nodes["highschool"][0][i]] = age_group_highschool[i]
+        for i in range(0, len(highschool_pop_)):
+            prob.append(highschool_pop_[i] / highschool_pop)
+        age_group_highschool = np2.random.choice(np.array([3, 7]), size=highschool_going, p=prob, replace=True)
+
+        for i in range(highschool_going):
+            age_tracker[nodes["highschool"][0][i]] = age_group_highschool[i]
+
+        out["highschool"] = [highschool_degree, highschool_clroom, n_highschool]
 
     # Work -----------------------------------------------------------
     # Degree dist., the mean and std div have been taken from the Potter et al data. The factor of 1/3 is used to correspond to daily values and is chosen to match with the work contact survey data
@@ -102,10 +119,8 @@ def build(args, ages, teachers, nodes):
     for i in range(working_going):
         age_tracker[nodes["work"][0][i]] = age_group_work[i]
 
-    return {
-        "preschool": [preschool_degree, preschool_clroom, n_preschool],
-        "primary": [primary_degree, primary_clroom, n_primary],
-        "highschool": [highschool_degree, highschool_clroom, n_highschool],
-        "work": [work_degree, job_place, n_work],
-        "age_tracker": age_tracker,
-    }
+    out["work"] = [work_degree, job_place, n_work]
+
+    out["age_tracker"] = age_tracker
+
+    return out

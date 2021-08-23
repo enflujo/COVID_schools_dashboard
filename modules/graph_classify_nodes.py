@@ -28,15 +28,20 @@ def build(args, ages, teachers):
     # state_ext, counts_ext = np2.unique(classify_pop_ext, return_counts=True)
 
     # Frac of population that is school going
-    dist_of_pop = [
-        preschool_pop / pop_input,
-        primary_pop / pop_input,
-        highschool_pop / pop_input,
-    ]
+    school_pop = [int(preschool_pop), int(primary_pop), int(highschool_pop)]
+    dist_of_pop = []
+    for i, spop in enumerate(school_pop):
+        if spop > 0:
+            dist_of_pop.append(spop/pop_input)
+
+    # Frac of population that is school going
     dist_of_pop[-1] += 1 - sum(dist_of_pop)
 
     # Classifying each person in school layers
-    classify_pop_schl = np2.random.choice(["preschool", "primary", "highschool"], size=pop, p=dist_of_pop)
+    levels_exists = np2.array(school_pop) > 0
+    levels_def = np2.array(["preschool", "primary", "highschool"])
+    levels_sys = list(levels_def[levels_exists])
+    classify_pop_schl = np2.random.choice(levels_sys, size=pop, p=dist_of_pop)
     # state_schl, counts_schl = np2.unique(classify_pop_schl, return_counts=True)
 
     # Concatenate nodes
@@ -48,13 +53,12 @@ def build(args, ages, teachers):
     dict_of_counts = dict(zip(state, counts))
 
     # TODO: Revisar primero si el key existe
-    return {
-        "preschool": [np2.where(classify_pop == "preschool")[0], dict_of_counts["preschool"]],
-        "primary": [np2.where(classify_pop == "primary")[0], dict_of_counts["primary"]],
-        "highschool": [np2.where(classify_pop == "highschool")[0], dict_of_counts["highschool"]],
-        "work": [np2.where(classify_pop == "work")[0], dict_of_counts["work"]],
-        "other": [np2.where(classify_pop == "other")[0], dict_of_counts["other"]],
-    }
+    res = {"work": [np2.where(classify_pop == "work")[0], dict_of_counts["work"]],
+          "other": [np2.where(classify_pop == "other")[0], dict_of_counts["other"]]}
+    for level in levels_sys:
+        res[level] = [np2.where(classify_pop == level)[0], dict_of_counts[level]]
+        
+    return res
 
 
 # def build(args, ages, teachers):

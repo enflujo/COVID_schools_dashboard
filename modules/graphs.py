@@ -53,68 +53,78 @@ def create_graph_matrix(args):
 
     age_tracker = degrees["age_tracker"]
 
+    school_levels = [args.n_school_going_preschool > 0,
+                    args.n_school_going_primary > 0,
+                    args.n_school_going_highschool > 0]
+    nets_out = []
     # Preschool
-    matrix_preschool = create_networks.create_external_corr_schools(
-        nodes["preschool"][1],
-        degrees["preschool"][0],
-        degrees["preschool"][2],
-        args.preschool_r,
-        nodes["preschool"][0],
-        degrees["preschool"][1],
-        age_tracker,
-        df_run_params,
-        args.delta_t,
-        args.length_room_preschool,
-        args.width_room_preschool,
-        args.height_room_preschool,
-        args.ventilation_out,
-        inhalation_mask,
-        exhalation_mask,
-        args.fraction_people_masks,
-        args.duration_event,
-    )
+    if school_levels[0] is True:
+        matrix_preschool = create_networks.create_external_corr_schools(
+            nodes["preschool"][1],
+            degrees["preschool"][0],
+            degrees["preschool"][2],
+            args.preschool_r,
+            nodes["preschool"][0],
+            degrees["preschool"][1],
+            age_tracker,
+            df_run_params,
+            args.delta_t,
+            args.length_room_preschool,
+            args.width_room_preschool,
+            args.height_room_preschool,
+            args.ventilation_out,
+            inhalation_mask,
+            exhalation_mask,
+            args.fraction_people_masks,
+            args.duration_event,
+        )
+        nets_out.append(matrix_preschool)
 
     # Primary
-    matrix_primary = create_networks.create_external_corr_schools(
-        nodes["primary"][1],
-        degrees["primary"][0],
-        degrees["primary"][2],
-        args.primary_r,
-        nodes["primary"][0],
-        degrees["primary"][1],
-        age_tracker,
-        df_run_params,
-        args.delta_t,
-        args.length_room_primary,
-        args.width_room_primary,
-        args.height_room_primary,
-        args.ventilation_out,
-        inhalation_mask,
-        exhalation_mask,
-        args.fraction_people_masks,
-        args.duration_event,
-    )
+    if school_levels[1] is True:
+        matrix_primary = create_networks.create_external_corr_schools(
+            nodes["primary"][1],
+            degrees["primary"][0],
+            degrees["primary"][2],
+            args.primary_r,
+            nodes["primary"][0],
+            degrees["primary"][1],
+            age_tracker,
+            df_run_params,
+            args.delta_t,
+            args.length_room_primary,
+            args.width_room_primary,
+            args.height_room_primary,
+            args.ventilation_out,
+            inhalation_mask,
+            exhalation_mask,
+            args.fraction_people_masks,
+            args.duration_event,
+        )
+        nets_out.append(matrix_primary)
 
     # Highschool
-    matrix_highschool = create_networks.create_external_corr_schools(
-        nodes["highschool"][1],
-        degrees["highschool"][0],
-        degrees["highschool"][2],
-        args.highschool_r,
-        nodes["highschool"][0],
-        degrees["highschool"][1],
-        age_tracker,
-        df_run_params,
-        args.delta_t,
-        args.length_room_highschool,
-        args.width_room_highschool,
-        args.height_room_highschool,
-        args.ventilation_out,
-        inhalation_mask,
-        exhalation_mask,
-        args.fraction_people_masks,
-        args.duration_event,
-    )
+    if school_levels[2] is True:
+        matrix_highschool = create_networks.create_external_corr_schools(
+            nodes["highschool"][1],
+            degrees["highschool"][0],
+            degrees["highschool"][2],
+            args.highschool_r,
+            nodes["highschool"][0],
+            degrees["highschool"][1],
+            age_tracker,
+            df_run_params,
+            args.delta_t,
+            args.length_room_highschool,
+            args.width_room_highschool,
+            args.height_room_highschool,
+            args.ventilation_out,
+            inhalation_mask,
+            exhalation_mask,
+            args.fraction_people_masks,
+            args.duration_event,
+        )
+        nets_out.append(matrix_highschool)
 
     # Work
     matrix_work = create_networks.create_external_corr(
@@ -128,6 +138,7 @@ def create_graph_matrix(args):
         df_run_params,
         args.delta_t,
     )
+    nets_out.append(matrix_work)
 
     # Community
     matrix_community = create_networks.create_external_corr(
@@ -141,13 +152,7 @@ def create_graph_matrix(args):
         df_run_params,
         args.delta_t,
     )
+    nets_out.append(matrix_community)
 
     # Saves graphs
-    return nodes, ages["total_pop"], [
-        matrix_household,
-        matrix_preschool,
-        matrix_primary,
-        matrix_highschool,
-        matrix_work,
-        matrix_community,
-    ]
+    return nodes, ages["total_pop"], nets_out
