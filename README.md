@@ -36,44 +36,28 @@ http://localhost:8000/?city=cali&n_teachers=90
 
 ### Parametros
 
-| nombre | type | default |
-| ------ | ---- | ------- |
-| city | `str` | `"bogota"` |
-| n_teachers | `int` | `0` |
-| n_teachers_vacc | `int` | `0` |
-| n_school_going | `int` | `0` |
-| n_classrooms | `int` | `0` |
-| classroom_size | `int` | `0` |
-| school_type | `bool` | `False` |
-| height_room | `float` | `3.1` |
-| width_room | `float` | `0.0` |
-| length_room | `float` | `0.0` |
-| masks_type | `str` | `"N95"` |
-| ventilation_level | `int` | `3` |
-| class_duration | `int` | `6` |
-
-
-## Notas
-
-- Las variables que tenemos como input no coinciden del todo con las que recibe el modelo. Ver en `server.py` las variables que recibe el API y las que se construyen con la clase `Args`.
-- **Falta definir post-procesamiento de resultados antes de enviar respuesta al cliente.**
-- ¿ Necesitamos pedir ciudad en formulario?
-- Si vamos a procesar por ciudades, toca buscar los datos de cada una, de momento sólo tenemos de Bogotá
-- Para crear los datos estáticos de cada cache hay unas funciones definidas llamadas `build` en cada archivo `/modules/graph_....` pero aún no tienen implementación para guardar los resultados automáticamente (lo estoy haciendo manual por ahora).
-
-## Problemas
-- Los resultados dan valores sin el mismo número de decimales que antes y muchos quedan en 0.0. Por ahora asumo que tiene que ver con los valores estáticos, me faltan pruebas para resolver esto.
-
-## Posibles optimizaciones
-
-- Revisar diferencia entre pandas y Dask (*parallel processing* si armamos un cluster en el servidor)
-
-## Sin Servidor
-
-El modelo se puede correr igual que antes directamente con python.
-
-Por ejemplo:
-
-```bash
-python run_sim_glob.py --population 100
-```
+| nombre | type | default | *opciones* |
+| ------ | ---- | ------- | -------- |
+| city | `str` | `"bogota"` | |
+| n_school_going_preschool | `int` | `150` | |
+| classroom_size_preschool | `int` | `15` | |
+| n_teachers_preschool | `int` | `5` | |
+| height_room_preschool | `float` | `3.1` | |
+| width_room_preschool | `float` | `7.0` | |
+| length_room_preschool | `float` | `7.0` | |
+| n_school_going_primary | `int` | `200` | |
+| classroom_size_primary | `int` | `35` | |
+| n_teachers_primary | `int` | `6` | |
+| height_room_primary | `float` | `3.1` | |
+| width_room_primary | `float` | `10.0` | |
+| length_room_primary | `float` | `10.0` | |
+| n_school_going_highschool | `int` | `200` | |
+| classroom_size_highschool | `int` | `35` | |
+| n_teachers_highschool | `int` | `7` | |
+| height_room_highschool | `float` | `3.1` | |
+| width_room_highschool | `float` | `10.0` | |
+| length_room_highschool | `float` | `10.0` | |
+| school_type | `bool` | `False` | |
+| masks_type | `str` | `"N95"` | `"cloth", "surgical" o "N95"`|
+| ventilation_level | `str` | `"alto"` | `"bajo", "medio" o "alto"`|
+| class_duration | `int` | `6` | |
