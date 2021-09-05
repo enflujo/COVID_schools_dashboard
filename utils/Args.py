@@ -1,58 +1,64 @@
 import os
+from pydantic import BaseModel
 
 base = os.getcwd()
 
 
+class Inputs(BaseModel):
+    city: str = "bogota"
+    n_school_going_preschool: int = 150
+    classroom_size_preschool: int = 15
+    n_teachers_preschool: int = 5
+    height_room_preschool: float = 3.1
+    width_room_preschool: float = 7.0
+    length_room_preschool: float = 7.0
+    n_school_going_primary: int = 200
+    classroom_size_primary: int = 35
+    n_teachers_primary: int = 6
+    height_room_primary: float = 3.1
+    width_room_primary: float = 10.0
+    length_room_primary: float = 10.0
+    n_school_going_highschool: int = 200
+    classroom_size_highschool: int = 35
+    n_teachers_highschool: int = 7
+    height_room_highschool: float = 3.1
+    width_room_highschool: float = 10.0
+    length_room_highschool: float = 10.0
+    school_type: bool = False
+    masks_type: str = "N95"
+    ventilation_level: str = "alto"
+    class_duration: int = 6
+
+
 class Args:
-    def __init__(
-        self,
-        city,
-        n_school_going_preschool,
-        classroom_size_preschool,
-        n_teachers_preschool,
-        height_room_preschool,
-        width_room_preschool,
-        length_room_preschool,
-        n_school_going_primary,
-        classroom_size_primary,
-        n_teachers_primary,
-        height_room_primary,
-        width_room_primary,
-        length_room_primary,
-        n_school_going_highschool,
-        classroom_size_highschool,
-        n_teachers_highschool,
-        height_room_highschool,
-        width_room_highschool,
-        length_room_highschool,
-        ventilation_level,
-        masks_type,
-        class_duration,
-    ):
+    def __init__(self, params):
+        inputs = Inputs(**params)
         ## USER
-        self.city = city  # City
+        self.city = inputs.city  # City
 
         # School parameters
-        self.n_teachers_preschool = n_teachers_preschool
-        self.n_school_going_preschool = n_school_going_preschool
-        self.preschool_size = classroom_size_preschool
-        self.height_room_preschool = height_room_preschool
-        self.width_room_preschool = width_room_preschool
-        self.length_room_preschool = length_room_preschool
+        self.n_teachers_preschool = inputs.n_teachers_preschool
+        self.n_school_going_preschool = inputs.n_school_going_preschool
+        self.preschool_size = inputs.classroom_size_preschool
+        self.height_room_preschool = inputs.height_room_preschool
+        self.width_room_preschool = inputs.width_room_preschool
+        self.length_room_preschool = inputs.length_room_preschool
 
-        self.n_teachers_primary = n_teachers_primary
-        self.n_school_going_primary = n_school_going_primary
-        self.primary_size = classroom_size_primary
-        self.height_room_primary = height_room_primary
-        self.width_room_primary = width_room_primary
-        self.length_room_primary = length_room_primary
+        self.n_teachers_primary = inputs.n_teachers_primary
+        self.n_school_going_primary = inputs.n_school_going_primary
+        self.primary_size = inputs.classroom_size_primary
+        self.height_room_primary = inputs.height_room_primary
+        self.width_room_primary = inputs.width_room_primary
+        self.length_room_primary = inputs.length_room_primary
 
-        self.n_teachers_highschool = n_teachers_highschool
-        self.n_school_going_highschool = n_school_going_highschool
-        self.highschool_size = classroom_size_highschool
-        self.height_room_highschool = height_room_highschool
-        self.width_room_highschool = width_room_highschool
-        self.length_room_highschool = length_room_highschool
+        self.n_teachers_highschool = inputs.n_teachers_highschool
+        self.n_school_going_highschool = inputs.n_school_going_highschool
+        self.highschool_size = inputs.classroom_size_highschool
+        self.height_room_highschool = inputs.height_room_highschool
+        self.width_room_highschool = inputs.width_room_highschool
+        self.length_room_highschool = inputs.length_room_highschool
+
+        ventilation_level = inputs.ventilation_level
 
         if ventilation_level == "bajo":
             self.ventilation_out = 2  # Ventilation values (h-1) that define how much ventilated is a classroom [2-15]
@@ -61,14 +67,16 @@ class Args:
         elif ventilation_level == "alto":
             self.ventilation_out = 15  # Ventilation values (h-1) that define how much ventilated is a classroom [2-15]
 
-        self.masks_type = masks_type  # Type of masks that individuals are using. Options are: cloth, surgical, N95
-        self.duration_event = class_duration  # Duration of event (i.e. classes/lectures) in hours over a day
+        # Type of masks that individuals are using. Options are: cloth, surgical, N95
+        self.masks_type = inputs.masks_type
+        # Duration of event (i.e. classes/lectures) in hours over a day
+        self.duration_event = inputs.class_duration
 
         ## DEFAULTS
 
         # Nodes
-        self.population = 30  # Speficy the number of individials
-        self.number_trials = 2  # Number of iterations per step
+        self.population = 100  # Speficy the number of individials
+        self.number_trials = 10  # Number of iterations per step
 
         self.intervention = 0.6  # Intervention efficiancy
         # Define the type of intervention [no_intervention,internvention,school_alternancy]

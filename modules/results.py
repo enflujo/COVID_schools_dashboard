@@ -1,11 +1,15 @@
 import pandas as pd
 
 
-def run(args, hvec, soln_ind, number_nodes, nodes):
+def run(number_trials, hvec, soln_ind, number_nodes, nodes):
 
     df_soln_ind_list = []
 
-    for i in range(args.number_trials):
+    # iter (iteración) | tvec (vector tiempo) | persona1 | persona2 | ....
+    #   0              |         4            |   0-6    |   0-6    | ....
+    #   0              |         8            |   0-6    |   0-6    | ....
+
+    for i in range(number_trials):
         inds_indx = [str(n) for n in range(0, number_nodes)]
         cols = ["iter", "tvec"]
         cols.extend(inds_indx)
@@ -19,6 +23,8 @@ def run(args, hvec, soln_ind, number_nodes, nodes):
         df_soln_ind_list.append(df_results_soln_ind_i)
 
     df_results_soln_ind = pd.concat(df_soln_ind_list)
+
+    # df_results_soln_ind.to_csv("res.csv", index=False)
 
     preschool_nodes = [str(n) for n in nodes["preschool"][0]]
     primary_nodes = [str(n) for n in nodes["primary"][0]]
@@ -34,7 +40,7 @@ def run(args, hvec, soln_ind, number_nodes, nodes):
     work_inf_list = []
     comm_inf_list = []
 
-    for i in range(args.number_trials):
+    for i in range(number_trials):
         df_soln_ind_i = df_soln_ind[df_soln_ind["iter"] == i]
 
         pre_inf = df_soln_ind_i[preschool_nodes] == 2

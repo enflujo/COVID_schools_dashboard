@@ -1,66 +1,93 @@
-from fastapi import FastAPI
-from run import process
-import os
-from utils.get_cache import run as build_cache
-from utils.Args import Args
+import json
+from fastapi import FastAPI, WebSocket
 
-base = os.getcwd()
+from utils.Args import Args
+from utils.NumpyEncoder import NumpyEncoder
+from modules.simulate import simulate
+
+from modules.graphs import create_graph_matrix
+from networks.network_dynamics import create_day_intervention_dynamics as dynamics
+
+from utils.get_cache import run as build_cache
+
 app = FastAPI()
 
+# TODO:
+# uuid para cada usuario
+# Si hay varios cores en servidor, repartir usuarios al desocupado
 
-@app.get("/")
-async def root(
-    city: str = "bogota",
-    n_school_going_preschool: int = 150,
-    classroom_size_preschool: int = 15,
-    n_teachers_preschool: int = 5,
-    height_room_preschool: float = 3.1,
-    width_room_preschool: float = 7.0,
-    length_room_preschool: float = 7.0,
-    n_school_going_primary: int = 200,
-    classroom_size_primary: int = 35,
-    n_teachers_primary: int = 6,
-    height_room_primary: float = 3.1,
-    width_room_primary: float = 10.0,
-    length_room_primary: float = 10.0,
-    n_school_going_highschool: int = 200,
-    classroom_size_highschool: int = 35,
-    n_teachers_highschool: int = 7,
-    height_room_highschool: float = 3.1,
-    width_room_highschool: float = 10.0,
-    length_room_highschool: float = 10.0,
-    school_type: bool = False,
-    masks_type: str = "N95",
-    ventilation_level: str = "alto",
-    class_duration: int = 6,
-):
-    args = Args(
-        city,
-        n_school_going_preschool,
-        classroom_size_preschool,
-        n_teachers_preschool,
-        height_room_preschool,
-        width_room_preschool,
-        length_room_preschool,
-        n_school_going_primary,
-        classroom_size_primary,
-        n_teachers_primary,
-        height_room_primary,
-        width_room_primary,
-        length_room_primary,
-        n_school_going_highschool,
-        classroom_size_highschool,
-        n_teachers_highschool,
-        height_room_highschool,
-        width_room_highschool,
-        length_room_highschool,
-        ventilation_level,
-        masks_type,
-        class_duration,
-    )
 
-    # print(args.__dict__)
-    # build_cache(args)
-    results = await process(args)
+@app.websocket("/ws")
+async def socket(websocket: WebSocket):
+    await websocket.accept()
 
-    return {"prediccion": results}
+    while True:
+        # Socket por donde se reciven los inputs del usuario
+        data = await websocket.receive_json()
+
+        if data["tipo"] == "inicio":
+            # Inputs entran en JSON y se suman a los args
+            args = Args(data)
+
+            # Crear caches
+            # build_cache(args)
+
+            # Iniciar proceso
+            pop = args.population * 2
+            Tmax = args.Tmax
+            days_intervals = [1] * Tmax
+            delta_t = args.delta_t
+            step_intervals = [int(x / delta_t) for x in days_intervals]
+            total_steps = sum(step_intervals)
+
+            # Crear nodos
+            print("nodos")
+            nodes, multilayer_matrix = create_graph_matrix(args)
+
+            # Pasa los datos por un convertidor de numpy a json string.
+            nodesString = json.dumps(nodes, cls=NumpyEncoder)
+            # Envia nodos al cliente - toca convertirlo de json string a json para que lleguen estructurados al front.
+            await websocket.send_json({"tipo": "nodos", "datos": json.loads(nodesString)})
+            print("creando dinamicas")
+            # Crear capas
+            time_intervals, ws = dynamics(
+                multilayer_matrix,
+                Tmax,
+                total_steps,
+                args.school_openings,
+                args.intervention,
+                args.school_occupation,
+                args.work_occupation,
+            )
+
+            trials = simulate(args, total_steps, pop, ws, time_intervals)
+            trialI = 0
+            stateI = 0
+            trialsLen = args.number_trials
+            statesLen = 600
+            trial = next(trials)
+
+        elif data["tipo"] == "sim":
+            print(trialI, stateI)
+            if trialI < trialsLen and stateI < statesLen:
+                state = next(trial)
+                stateI = stateI + 1
+
+                stateString = json.dumps(state, cls=NumpyEncoder)
+                await websocket.send_json(
+                    {
+                        "tipo": "estado",
+                        "datos": json.loads(stateString),
+                        "trialI": trialI,
+                        "stateI": stateI,
+                    }
+                )
+
+                if stateI == statesLen:
+                    trialI = trialI + 1
+                    stateI = 0
+                    try:
+                        trial = next(trials)
+                    except StopIteration:
+                        await websocket.send_json({"tipo": "fin"})
+                        print("fin")

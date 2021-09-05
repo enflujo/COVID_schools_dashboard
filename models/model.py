@@ -252,13 +252,14 @@ def simulate_intervals(
       state_timer, and states_cumulative are the final state of the simulation and
       history is the number of each type over the course of the simulation.
     """
-    history = []
-    states_evolution = np.zeros((len(step_intervals), init_state.shape[0]), dtype=np.int8)
+
+    # history = []
+    # states_evolution = np.zeros((len(step_intervals), init_state.shape[0]), dtype=np.int8)
     state, state_timer = init_state, init_state_timer
     states_cumulative = np.logical_or(to_one_hot(state), np.zeros_like(to_one_hot(state), dtype=np.bool_))
 
     for t, (w, total_steps) in enumerate(zip(ws, step_intervals)):
-        key, state, state_timer, states_cumulative, history_ = simulate(
+        key, state, state_timer, states_cumulative, _ = simulate(
             w,
             total_steps,
             state_length_sampler,
@@ -270,7 +271,10 @@ def simulate_intervals(
             epoch_len,
             states_cumulative,
         )
-        history.extend(history_)
-        states_evolution = index_add(states_evolution, index[t, :], np.array(state))
 
-    return states_evolution, history
+        yield state
+
+        # history.extend(history_)
+        # states_evolution = index_add(states_evolution, index[t, :], np.array(state))
+
+    # return states_evolution, history

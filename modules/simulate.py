@@ -90,9 +90,6 @@ def simulate(args, total_steps, pop, ws, time_intervals):
     BOG_I3 = 0
     BOG_D = 0
 
-    soln = np.zeros((args.number_trials, total_steps, 7))
-    soln_ind = np.zeros((args.number_trials, len(time_intervals), pop), dtype=np.int8)
-
     for key in range(args.number_trials):
 
         # Initial condition
@@ -112,8 +109,7 @@ def simulate(args, total_steps, pop, ws, time_intervals):
 
         _, init_state_timer = state_length_sampler(random.PRNGKey(key), init_state)
 
-        # Run simulation
-        states_evolution, total_history = simulate_intervals(
+        interval = simulate_intervals(
             ws,
             time_intervals,
             state_length_sampler,
@@ -125,9 +121,4 @@ def simulate(args, total_steps, pop, ws, time_intervals):
             epoch_len=1,
         )
 
-        # This unpacks current state counts
-        history = np.array(total_history)[:, 0, :]
-        soln = index_add(soln, index[key, :, :], history)
-        soln_ind = index_add(soln_ind, index[key, :, :], states_evolution)
-
-    return soln_ind
+        yield interval
