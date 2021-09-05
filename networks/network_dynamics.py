@@ -261,14 +261,7 @@ def night_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.7):
 
 
 def create_day_intervention_dynamics(
-    Graphs_matrix,
-    Tmax,
-    total_steps,
-    schools_day_open,
-    interv_glob,
-    schl_occupation,
-    work_occupation,
-    partitions=[8, 8, 8],
+    Graphs_matrix, Tmax, total_steps, schools_day_open, interv_glob, schl_occupation, work_occupation
 ):
     """
     A day is devided in 3 partitions with consists of sets of hours over a day
@@ -278,9 +271,7 @@ def create_day_intervention_dynamics(
     delta_t      -> steps over a day
     """
     # Hours distribution in a day
-    if sum(partitions) != 24:
-        print("Partitions must sum the total of hours in a day (24h)")
-
+    partitions = [8, 8, 8]
     steps_per_days = int(total_steps / Tmax)
 
     m_day = int(steps_per_days * (partitions[0] / 24))
@@ -309,71 +300,5 @@ def create_day_intervention_dynamics(
         else:
             sim_intervals.extend(days_intervals)
             sim_ws.extend(w_interv_intervals_schl_open)
-
-    return sim_intervals, sim_ws
-
-
-def create_day_intervention_altern_schools_dynamics(
-    Graphs_matrix,
-    Tmax,
-    total_steps,
-    schools_day_open,
-    interv_glob,
-    schl_occupation,
-    work_occupation,
-    partitions=[8, 8, 8],
-):
-    """
-    A day is devided in 3 partitions with consists of sets of hours over a day
-    partition[0] -> morning: only a % of households and community is activated
-    partition[1] -> evening: only work and school layers are activated
-    partition[2] -> night: only a % of households and community is activated
-    delta_t      -> steps over a day
-    """
-    # Hours distribution in a day
-    if sum(partitions) != 24:
-        print("Partitions must sum the total of hours in a day (24h)")
-
-    steps_per_days = int(total_steps / Tmax)
-
-    m_day = int(steps_per_days * (partitions[0] / 24))
-    e_day = int(steps_per_days * (partitions[1] / 24))
-    n_day = int(steps_per_days * (partitions[2] / 24))
-    days_intervals = [m_day, e_day, n_day]
-
-    m_w_interv = morning_set_intervention(Graphs_matrix, interv_glob)
-    e_w_interv_schl_close = day_set_intervention(
-        Graphs_matrix, interv_glob, schl_occupation=0, work_occupation=work_occupation
-    )
-    e_w_interv_schl_open_set1 = day_set_intervention(Graphs_matrix, interv_glob, schl_occupation, work_occupation)
-    e_w_interv_schl_open_set2 = day_set_intervention(Graphs_matrix, interv_glob, schl_occupation, work_occupation)
-    n_w_interv = night_set_intervention(Graphs_matrix, interv_glob)
-
-    w_interv_intervals_schl_close = [m_w_interv, e_w_interv_schl_close, n_w_interv]
-    w_interv_intervals_schl_open_set1 = [m_w_interv, e_w_interv_schl_open_set1, n_w_interv]
-    w_interv_intervals_schl_open_set1 = [m_w_interv, e_w_interv_schl_open_set2, n_w_interv]
-
-    altern_period = 8  # days
-    days_1 = 0
-    days_2 = 0
-
-    sim_intervals = []  # iterations per network set w
-    sim_ws = []  # networks per iteration
-    for i, d in enumerate(range(Tmax)):
-        if d < schools_day_open:
-            sim_intervals.extend(days_intervals)
-            sim_ws.extend(w_interv_intervals_schl_close)
-        else:
-            if days_1 < altern_period and days_2 == 0:
-                sim_intervals.extend(days_intervals)
-                sim_ws.extend(w_interv_intervals_schl_open_set1)
-                days_1 += 1
-            else:
-                sim_intervals.extend(days_intervals)
-                sim_ws.extend(w_interv_intervals_schl_open_set1)
-                days_2 += 1
-                if days_2 < altern_period:
-                    days_1 = 0
-                    days_2 = 0
 
     return sim_intervals, sim_ws
