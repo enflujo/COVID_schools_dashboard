@@ -22,7 +22,7 @@ async def socket(websocket: WebSocket):
     await websocket.accept()
 
     while True:
-        # Socket por donde se reciven los inputs del usuario
+        # Socket por donde se reciben los inputs del usuario
         data = await websocket.receive_json()
 
         if data["tipo"] == "inicio":
@@ -68,7 +68,6 @@ async def socket(websocket: WebSocket):
             trial = next(trials)
 
         elif data["tipo"] == "sim":
-            print(trialI, stateI)
             if trialI < trialsLen and stateI < statesLen:
                 state = next(trial)
                 stateI = stateI + 1
