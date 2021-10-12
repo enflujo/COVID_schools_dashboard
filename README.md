@@ -24,6 +24,28 @@ Para desarrollo local se puede iniciar con `--reload` para reiniciar cuando se h
 uvicorn server:app --reload
 ```
 
+## Docker
+
+La aplicación se despliega como imagen de Docker. Para actualizar la imagen en Docker Hub:
+
+### Crear imagen localmente
+
+```bash
+docker build -t enflujo/colegios-api .
+```
+
+*Probar imagen localmente antes de subir a Docker Hub:*
+
+```bash
+docker run --name colegios-api -p 8000:80 enflujo/colegios-api:latest
+```
+
+### Actualizar imagen en Docker Hub
+
+```bash
+docker push enflujo/colegios-api
+```
+
 ## Sitio
 
 **La página queda en <a href="http://localhost:8000" target="_blank">localhost:8000</a>**
