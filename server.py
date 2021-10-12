@@ -68,7 +68,6 @@ async def socket(websocket: WebSocket):
             trial = next(trials)
 
         elif data["tipo"] == "sim":
-            print(trialI, stateI)
             if trialI < trialsLen and stateI < statesLen:
                 state = next(trial)
                 stateI = stateI + 1
