@@ -2,6 +2,7 @@ import json
 from fastapi import FastAPI, WebSocket
 
 from utils.Args import Args
+
 from utils.NumpyEncoder import NumpyEncoder
 from modules.simulate import simulate
 
@@ -13,8 +14,7 @@ from utils.get_cache import run as build_cache
 app = FastAPI()
 
 # TODO:
-# uuid para cada usuario
-# Si hay varios cores en servidor, repartir usuarios al desocupado
+# - Eliminar logs cuando se desconecta usuario.
 
 
 @app.websocket("/ws")
