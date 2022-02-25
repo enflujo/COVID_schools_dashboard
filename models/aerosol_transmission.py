@@ -11,7 +11,6 @@ import numpy as np2
 PRESSURE = 0.74  # atm
 TEMPERATURE = 30  # C
 RELATIVE_HUMIDITY = 0.8  # (1)
-
 DACAY_RATE_VIRUS = 0.63  # h-1
 DEPOSITION_SURFACES = 0.3  # h-1
 ADDITIONAL_CONTROLS = 0  # h-1
@@ -19,7 +18,6 @@ ADDITIONAL_CONTROLS = 0  # h-1
 # People and activity in room parameters -------------------------------------------------------
 
 INFECTED_PEOPLE = 1  # Assumption of infected people in room
-
 QUANTA_EXHATATION_RATE = 25  # Infectious doses (quanta) h-1
 
 # Parameters related to the COVID-19 -----------------------------------------------------------

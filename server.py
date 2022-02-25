@@ -46,7 +46,7 @@ async def socket(websocket: WebSocket):
 
             # Pasa los datos por un convertidor de numpy a json string.
             nodesString = json.dumps(nodes, cls=NumpyEncoder)
-            # Envia nodos al cliente - toca convertirlo de json string a json para que lleguen estructurados al front.
+            # Envía nodos al cliente - toca convertirlo de json string a json para que lleguen estructurados al front.
             await websocket.send_json({"tipo": "nodos", "datos": json.loads(nodesString)})
             print("creando dinamicas")
             # Crear capas

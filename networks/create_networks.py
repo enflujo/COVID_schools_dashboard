@@ -27,8 +27,8 @@ def get_age_class(node_age):
 
 
 def set_infection_prob(edges, ages, df_ages_params, delta_t, calculate_individual_degree=calculate_individual_degree):
-    """Set individual infection probability depending on the connection of an individiual.
-    @param graph : Graph repesenting population struture
+    """Set individual infection probability depending on the connection of an individual.
+    @param graph : Graph representing population structure
     @type : nx undirected graph
     @param R0 :  Basic reproductive number set for all the system
     @type : float
@@ -79,8 +79,8 @@ def set_infection_prob_schools(
     delta_t,
     calculate_individual_degree=calculate_individual_degree,
 ):
-    """Set individual infection probability depending on the connection of an individiual.
-    @param graph : Graph repesenting population struture
+    """Set individual infection probability depending on the connection of an individual.
+    @param graph : Graph representing population structure
     @type : nx undirected graph
     @param R0 :  Basic reproductive number set for all the system
     @type : float
@@ -176,7 +176,7 @@ def create_external_corr(pop_subset, degree_dist, n, r, indx_list, correlation_g
     @type : list or 1D array
     @param correlation_group : Array of traits that are used to preferentially connect individuals
     @type : 1D array
-    @param graph : Graph repesenting population struture
+    @param graph : Graph representing population structure
     @type : nx undirected graph
     @param R0 :  Basic reproductive number set for all the system
     @type : float
@@ -277,7 +277,7 @@ def create_external_corr_schools(
     @type : list or 1D array
     @param correlation_group : Array of traits that are used to preferentially connect individuals
     @type : 1D array
-    @param graph : Graph repesenting population struture
+    @param graph : Graph representing population structure
     @type : nx undirected graph
     @param R0 :  Basic reproductive number set for all the system
     @type : float
