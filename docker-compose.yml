@@ -1,0 +1,8 @@
+version: '3.2'
+
+services:
+  api:
+    container_name: colegios-api
+    build: .
+    ports:
+      - 8000:80
